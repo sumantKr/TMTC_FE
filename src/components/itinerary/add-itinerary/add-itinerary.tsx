@@ -1,20 +1,26 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { addDays, format } from "date-fns";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { addItinerary, updateItinerary } from "@/service/api/itinerary.service";
+import { IItinerary } from "@/types/itinerary";
+import { useRouter } from "next/navigation";
 import { createItinerarySchema, CreateItinerarySchema } from "./add-itinerary.config";
-import { addItinerary } from "@/service/api/itinerary.service";
 
-export default function AddItineraryForm() {
+interface IAddItineraryFormProps {
+  defaultValues?: IItinerary
+  onSubmit?: () => void;
+}
+export default function AddItineraryForm({ defaultValues, onSubmit }: IAddItineraryFormProps) {
   const {
     register,
     handleSubmit,
@@ -23,21 +29,34 @@ export default function AddItineraryForm() {
     formState: { errors },
   } = useForm<CreateItinerarySchema>({
     resolver: zodResolver(createItinerarySchema),
+    defaultValues
   });
+
+  const { refresh } = useRouter()
 
   const startDate = watch("startDate");
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutateAsync: addToItinerary, isPending } = useMutation({
     mutationFn: addItinerary,
   });
+  const { mutateAsync: editItinerary, isPending: isEditPending } = useMutation({
+    mutationFn: updateItinerary,
+  });
 
-  const onSubmit = async (data: CreateItinerarySchema) => {
-    const response = await mutateAsync(data);
+  const handleSubmission = async (data: CreateItinerarySchema) => {
+    let response;
+    if (!defaultValues) {
+      response = await addToItinerary(data);
+    } else {
+      response = await editItinerary({ id: defaultValues._id, itineraryDetails: data });
+    }
     if (response.error) {
-      toast.error(response.message || "Failed to add itinerary");
+      toast.error(response.message);
       return;
     }
-    toast.success("Itinerary added successfully!");
+    toast.success(defaultValues ? "Itinerary Updated" : "Itinerary added successfully!");
+    refresh()
+    
   };
 
   useEffect(() => {
@@ -52,10 +71,10 @@ export default function AddItineraryForm() {
     <div className="flex justify-center items-center">
       <Card className="w-full shadow-xl border mx-auto">
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold">Add Itinerary</CardTitle>
+          <CardTitle className="text-center text-2xl font-bold">{defaultValues ? "Edit" : "Add"}  Itinerary</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(handleSubmission)} className="space-y-4">
             <div className="space-y-1">
               <Label htmlFor="title">Title</Label>
               <Input id="title" {...register("title")} placeholder="Trip to Bali" />
@@ -102,9 +121,15 @@ export default function AddItineraryForm() {
               {errors.endDate && <p className="text-sm text-red-600">{errors.endDate.message}</p>}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isPending}>
+            {!defaultValues && <Button type="submit" className="w-full" disabled={isPending || isEditPending}>
               {isPending ? "Adding..." : "Add Itinerary"}
-            </Button>
+            </Button>}
+            {defaultValues && <Button type="submit" className="w-full" disabled={isPending || isEditPending}>
+              {isEditPending ? "Editing..." : "Edit Itinerary"}
+            </Button>}
+            {defaultValues && <Button type="button" variant={'outline'} className="w-full" onClick={onSubmit}>
+              Cancel
+            </Button>}
           </form>
         </CardContent>
       </Card>

@@ -11,7 +11,7 @@ const ABSOLUTE_ROUTES = {
     ROOT: "/travel-calendar",
   },
   TRAVEL_BOARD: {
-    ROOT: "/travel-list",
+    ROOT: "/travel-board",
   },
   ADD_ITINERARY: {
     ROOT: "/add-itinerary",

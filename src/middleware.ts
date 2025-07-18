@@ -5,6 +5,7 @@ export default function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("_ac_jwt")?.value;
 
+
   const isPublic = PUBLIC_ROUTES.includes(pathname);
   const isAuthenticated = !!token;
 

@@ -1,10 +1,24 @@
+"use server";
 import { API_URL } from "@/config/constants";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { IApiResponse } from "./api-client.type";
+import { cookies } from "next/headers";
 
 const apiClient = axios.create({
   baseURL: API_URL,
   withCredentials: true,
+});
+
+// Attach JWT from cookies (on server)
+apiClient.interceptors.request.use(async (config) => {
+  const cookieStore = await cookies();
+  const jwt = cookieStore.get("_ac_jwt")?.value;
+
+  if (jwt) {
+    config.headers?.set?.("Cookie", `_ac_jwt=${jwt}`);
+  }
+
+  return config;
 });
 
 function errorResponse(error: any): IApiResponse {
@@ -55,11 +69,14 @@ export async function PUT(
 }
 export async function DELETE(
   url: string,
-  body?: Record<string, any> | FormData,
+  params?: Record<string, any>,
   config?: AxiosRequestConfig
 ): Promise<IApiResponse> {
   try {
-    const response = await apiClient.post<IApiResponse>(url, body, config);
+    const response = await apiClient.delete<IApiResponse>(url, {
+      ...config,
+      params,
+    });
     return response.data;
   } catch (error: any) {
     const e = (error as AxiosError).response?.data;

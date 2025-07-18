@@ -1,4 +1,4 @@
-import AddItineraryForm from '@/components/add-itinerary/add-itinerary'
+import AddItineraryForm from '@/components/itinerary/add-itinerary/add-itinerary'
 import React from 'react'
 
 function AddItineraryPage() {

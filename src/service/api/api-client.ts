@@ -1,26 +1,24 @@
-"use server";
 import { API_URL } from "@/config/constants";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { IApiResponse } from "./api-client.type";
-import { cookies } from "next/headers";
 
 const apiClient = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
 
-// Attach JWT from cookies (on server)
 apiClient.interceptors.request.use(async (config) => {
-  const cookieStore = await cookies();
-  const jwt = cookieStore.get("_ac_jwt")?.value;
-
-  if (jwt) {
-    config.headers?.set?.("Cookie", `_ac_jwt=${jwt}`);
+  if (typeof window === "undefined") {
+    // Only run on the server (Node.js)
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get("_ac_jwt")?.value;
+    if (jwt) {
+      config.headers?.set?.("Cookie", `_ac_jwt=${jwt}`);
+    }
   }
-
   return config;
 });
-
 function errorResponse(error: any): IApiResponse {
   return { ...error, error: true };
 }

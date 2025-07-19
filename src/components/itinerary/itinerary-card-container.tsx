@@ -48,8 +48,7 @@ export default function ItineraryContainer({
   return (
     <div className="p-8 flex justify-between items-start relative  max-w-2xl mx-auto bg-gray-50 rounded-xl shadow-lg">
       {content}
-      <div>
-
+      <div className="space-x-2">
         <EditItineraryModal defaultValues={itinerary} />
         <DeleteItineraryModal itineraryId={_id} />
       </div>

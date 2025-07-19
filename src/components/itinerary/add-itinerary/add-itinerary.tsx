@@ -15,6 +15,7 @@ import { addItinerary, updateItinerary } from "@/service/api/itinerary.service";
 import { IItinerary } from "@/types/itinerary";
 import { useRouter } from "next/navigation";
 import { createItinerarySchema, CreateItinerarySchema } from "./add-itinerary.config";
+import { ROUTES } from "@/config/routes.config";
 
 interface IAddItineraryFormProps {
   defaultValues?: IItinerary
@@ -29,10 +30,14 @@ export default function AddItineraryForm({ defaultValues, onSubmit }: IAddItiner
     formState: { errors },
   } = useForm<CreateItinerarySchema>({
     resolver: zodResolver(createItinerarySchema),
-    defaultValues
+    defaultValues: defaultValues ? {
+      ...defaultValues,
+      startDate: format(new Date(defaultValues.startDate), "yyyy-MM-dd"),
+      endDate: format(new Date(defaultValues.endDate), "yyyy-MM-dd"),
+    } : {}
   });
 
-  const { refresh } = useRouter()
+  const { replace } = useRouter()
 
   const startDate = watch("startDate");
 
@@ -55,15 +60,17 @@ export default function AddItineraryForm({ defaultValues, onSubmit }: IAddItiner
       return;
     }
     toast.success(defaultValues ? "Itinerary Updated" : "Itinerary added successfully!");
-    refresh()
-    
+    replace(`${ROUTES.TRAVEL_BOARD}/${response.data._id}`)
+
+
   };
 
   useEffect(() => {
-    if (startDate) {
-      setValue("endDate", ""); // Reset endDate when startDate changes
+    const currentEndDate = watch("endDate");
+    if (startDate && currentEndDate && currentEndDate < startDate) {
+      setValue("endDate", "");
     }
-  }, [startDate, setValue]);
+  }, [startDate]);
 
   const minStartDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
 

@@ -12,7 +12,6 @@ import { loginUser } from "@/service/api/auth.service";
 import toast from "react-hot-toast";
 import { ROUTES } from "@/config/routes.config";
 import { Button } from "../ui/button";
-import { API_URL } from "@/config/constants";
 import Link from "next/link";
 
 
@@ -34,7 +33,6 @@ export default function LoginForm() {
     });
 
     const onSubmit = async (data: LoginSchema) => {
-        console.debug('🚀 ~ onSubmit ~ data:', data)
         if (data.email === '') {
             delete data.email
         }

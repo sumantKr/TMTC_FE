@@ -1,4 +1,5 @@
 import ItineraryContainer from "@/components/itinerary/itinerary-card-container";
+import TravelBoardHeader from "@/components/itinerary/travel-board-header";
 import { ROUTES } from "@/config/routes.config";
 import { IApiResponse } from "@/service/api/api-client.type";
 import { getItineraries } from "@/service/api/itinerary.service";
@@ -10,27 +11,37 @@ import Link from "next/link";
 
 interface IItinerarySearchParam {
     page: string
+    title?: string
 }
 
 type ItineraryListPageProps = IPageProps<IItinerarySearchParam>
 export default async function ItineraryListPage({ searchParams }: ItineraryListPageProps) {
     const itinerarySearchParams = await searchParams
     const pageNumber = parseInt(itinerarySearchParams.page || "1", 10);
+    const title = itinerarySearchParams.title;
 
     const queryClient = new QueryClient();
 
     await queryClient.prefetchQuery({
-        queryKey: ["itineraries", pageNumber],
-        queryFn: () => getItineraries(pageNumber),
+        queryKey: ["itineraries", pageNumber, title],
+        queryFn: () => getItineraries(pageNumber, title),
     });
 
-    const data: IApiResponse = await queryClient.getQueryData(["itineraries", pageNumber])!;
+    const data: IApiResponse = await queryClient.getQueryData(["itineraries", pageNumber, title])!;
 
     const { data: itineraries, meta } = data;
     const { totalPages } = meta!
 
+    if (itineraries.length === 0) {
+        return <div className="p-32">
+            <Link href={ROUTES.ADD_ITINERARY} className="font-semibold text-blue-500">Click here</Link>  to add travel plans!
+        </div>
+    }
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
+
+
+            <TravelBoardHeader defaultFilter={title} />
             <div className="p-6 space-y-6">
                 {/* Grid of Cards */}
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">

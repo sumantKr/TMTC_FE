@@ -29,8 +29,9 @@ export async function getItineraryById(itineraryId: string) {
 export async function deleteItinerary(itineraryId: string) {
   return await DELETE(`${itineraryRoute}/${itineraryId}`);
 }
-export async function getItineraries(page: number) {
-  return await GET(itineraryListRoute, { page, limit: 10 });
+export async function getItineraries(page: number, title?: string) {
+  const res = await GET(itineraryListRoute, { page, limit: 10, title });
+  return res;
 }
 export async function getItinerariesCalendarView(startDate: Date) {
   return await GET(itineraryListRoute, {

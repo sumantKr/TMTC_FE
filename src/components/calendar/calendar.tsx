@@ -165,12 +165,9 @@ const Calendar = ({
 
 export const useCalendar = () => useContext(Context);
 
-const CalendarViewTrigger = forwardRef<
-    HTMLButtonElement,
-    React.HTMLAttributes<HTMLButtonElement> & {
-        view: View;
-    }
->(({ children, view, ...props }) => {
+const CalendarViewTrigger = ({ children, view, ...props }: React.HTMLAttributes<HTMLButtonElement> & {
+    view: View;
+}) => {
     const { view: currentView, setView, onChangeView } = useCalendar();
 
     return (
@@ -187,7 +184,7 @@ const CalendarViewTrigger = forwardRef<
             {children}
         </Button>
     );
-});
+};
 CalendarViewTrigger.displayName = 'CalendarViewTrigger';
 
 const EventGroup = ({
@@ -373,10 +370,10 @@ const CalendarMonthView = () => {
                                 {format(_date, 'd')}
                             </span>
 
-                            {currentEvents.map((event) => {
+                            {currentEvents.map((event, idx) => {
                                 return (
                                     <div
-                                        key={event.id}
+                                        key={idx}
                                         className="px-1 rounded text-sm flex items-center gap-1"
                                     >
                                         <div

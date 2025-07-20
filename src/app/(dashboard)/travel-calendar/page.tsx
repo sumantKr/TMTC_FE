@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 
 function TravelCalendarPage() {
-  const [startDate, setStartDate] = useState(new Date())
+  const [startDate,] = useState(new Date())
   const { data: travelData, isLoading } = useQuery({
     queryKey: ['travel-calendar', startDate],
     queryFn: () => getItinerariesCalendarView(startDate)
@@ -18,6 +18,12 @@ function TravelCalendarPage() {
         Loading...
       </div>
     );
+  if (travelData?.error || !travelData?.data) {
+    <div className="text-muted-foreground text-center py-10">
+      No travel data found
+    </div>
+
+  }
   return (
     <Calendar defaultDate={startDate} view='week' events={travelData?.data ?? []} >
       <div className="h-dvh py-6 flex flex-col">

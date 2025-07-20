@@ -33,12 +33,14 @@ npm install
 
 ### 2. 🔐 Setup Environment Variables
 NEXT_PUBLIC_API_BASE_URL=YOUR_BACKEND_API
-
 ### 3. ▶️ Start the Development Server
 npm run dev
 
 # with docker
 run docker compose up - the codebase is bind mounted and supports hmr
+### env variables
+INTERNAL_URL=FOR DOCKER INTERNAL
+
 
 # Check lint errors
 npm run lint

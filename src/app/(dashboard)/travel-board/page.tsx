@@ -30,9 +30,14 @@ export default async function ItineraryListPage({ searchParams }: ItineraryListP
     const data: IApiResponse = await queryClient.getQueryData(["itineraries", pageNumber, title])!;
 
     const { data: itineraries, meta } = data;
+    if(data.error){
+        return <div className="font-semibold text-red-500">
+            Cannot get itineraries...
+        </div>
+    }
     const { totalPages } = meta!
 
-    if (itineraries.length === 0) {
+    if (itineraries.length === 0 ) {
         return <div className="p-32">
             <Link href={ROUTES.ADD_ITINERARY} className="font-semibold text-blue-500">Click here</Link>  to add travel plans!
         </div>

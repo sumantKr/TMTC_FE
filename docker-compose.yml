@@ -12,3 +12,6 @@ services:
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
+      - WATCHPACK_POLLING_INTERVAL=1000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - INTERNAL_URL=${INTERNAL_URL}
